@@ -44,5 +44,5 @@ npm run start
 ## Team Details
 
 - Jayash - jayashysaini7361@gmail.com
-- Hamza
-- Aayush
+- Hamza - hamzakhan174722@gmail.com
+- Aayush -aayushh2k@gmail.com
