@@ -18,6 +18,12 @@ const userSchema = new Schema({
     avatar: {
         type: String,
         required: true
+    },
+    loginType: {
+        type: String,
+        required: true,
+        enum: ['local', 'google'],
+        default: 'local'
     }
 });
 
