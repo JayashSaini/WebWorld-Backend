@@ -3,24 +3,61 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const session = require('express-session');
+const passport = require('passport');
+const { ApiError } = require('./utils/ApiError.js');
+const { errorHandler } = require('./middlewares/error.middlewares.js');
 
 const app = express();
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN || '*',
-    credentials: true,
-  })
-);
 
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+const startApp = () => {
+  // import routes
+  const userRouter = require('./routes/auth/user.routes.js');
 
-app.use(cookieParser());
+  app.use(
+    cors({
+      origin: process.env.CORS_ORIGIN || '*',
+      credentials: true,
+    })
+  );
 
-// Set security headers with Helmet middleware
-app.use(helmet());
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+  app.use(cookieParser());
 
-// Log requests with Morgan middleware (use 'combined' format for production)
-app.use(morgan('dev'));
+  // required for passport
+  app.use(
+    session({
+      secret: process.env.EXPRESS_SESSION_SECRET,
+      resave: true,
+      saveUninitialized: true,
+    })
+  );
 
-module.exports = { app };
+  // session secret
+  app.use(passport.initialize());
+  app.use(passport.session());
+
+  // Set security headers with Helmet middleware
+  app.use(helmet());
+
+  // Log requests with Morgan middleware (use 'combined' format for production)
+  app.use(morgan('dev'));
+
+  // routes
+  app.use('/api/v1/users', userRouter);
+  app.get('/api/v1/hello', (req, res) => {
+    res.status(200).json({ message: 'Hello World!' });
+  });
+
+  // if endpoint not found
+  app.use((_, __, next) => {
+    const error = new ApiError(404, 'endpoint not found');
+    next(error);
+  });
+
+  // Error handler
+  app.use(errorHandler);
+};
+
+module.exports = { app, startApp };

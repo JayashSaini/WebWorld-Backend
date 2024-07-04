@@ -18,7 +18,10 @@ const syllabusSchema = new mongoose.Schema(
       trim: true,
     },
     video: {
-      type: String,
+      type: {
+        url: String,
+        title: String,
+      },
       required: true,
     },
   },
