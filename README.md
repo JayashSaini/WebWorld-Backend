@@ -41,8 +41,9 @@ npm run start
 4. Push your changes to your forked repository: \`git push origin feat/your-feature-name\`.
 5. Submit a pull request to the main repository, explaining the changes you've made and providing any necessary details.
 
-## Team Details
+## Developer Details
 
-- Jayash - jayashysaini7361@gmail.com
-- Hamza - hamzakhan174722@gmail.com
-- Aayush -aayushh2k@gmail.com
+Name - Jayash Saini <br>
+Contact No. - 9079830785 <br>
+Email ID - jayashysaini7361@gmail.com <br>
+LinkedIn - [Linked](https://www.linkedin.com/in/jayash-saini-371bb0267/)
