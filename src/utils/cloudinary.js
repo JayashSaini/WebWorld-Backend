@@ -17,12 +17,18 @@ v2.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-async function uploadOnCloudinary(localPath) {
+async function uploadOnCloudinary(localPath, isAvatarSize = false) {
+  let imageSpecification = {};
   try {
     if (!localPath) return null;
-    const response = await v2.uploader.upload(localPath, {
-      transformation: { width: 128, height: 128, crop: 'fill' },
-    });
+
+    if (isAvatarSize) {
+      imageSpecification = {
+        transformation: { width: 128, height: 128, crop: 'fill' },
+      };
+    }
+
+    const response = await v2.uploader.upload(localPath, imageSpecification);
     removeLocalFile(localPath);
     return response;
   } catch (error) {

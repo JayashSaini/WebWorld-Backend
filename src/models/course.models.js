@@ -2,6 +2,13 @@ const mongoose = require('mongoose');
 
 const courseSchema = new mongoose.Schema(
   {
+    thumbnail: {
+      type: {
+        url: String,
+        public_id: String,
+      },
+      required: true,
+    },
     title: {
       type: String,
       required: true,

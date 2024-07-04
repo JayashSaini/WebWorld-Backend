@@ -13,6 +13,7 @@ const app = express();
 const startApp = () => {
   // import routes
   const userRouter = require('./routes/auth/user.routes.js');
+  const courseRouter = require('./routes/course.routes.js');
 
   app.use(
     cors({
@@ -46,9 +47,7 @@ const startApp = () => {
 
   // routes
   app.use('/api/v1/users', userRouter);
-  app.get('/api/v1/hello', (req, res) => {
-    res.status(200).json({ message: 'Hello World!' });
-  });
+  app.use('/api/v1/courses', courseRouter);
 
   // if endpoint not found
   app.use((_, __, next) => {

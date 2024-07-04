@@ -3,7 +3,6 @@ const User = require('../../models/auth/user.models.js');
 const { AvailableUserRoles } = require('../../constants.js');
 
 const userRegisterValidator = () => {
-  console.log(' in register validator');
   return [
     body('email')
       .trim()

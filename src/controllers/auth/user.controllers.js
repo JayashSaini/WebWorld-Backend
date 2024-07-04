@@ -427,7 +427,7 @@ const updateAvatar = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Avatar file is missing');
   }
 
-  const avatar = await uploadOnCloudinary(avatarLocalPath);
+  const avatar = await uploadOnCloudinary(avatarLocalPath, true);
 
   if (!avatar.url) {
     throw new ApiError(400, 'Error while uploading on avatar');
