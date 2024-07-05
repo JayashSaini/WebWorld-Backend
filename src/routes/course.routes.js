@@ -22,14 +22,13 @@ const {
 } = require('../validators/mongodb.validators.js');
 const { UserRolesEnum } = require('../constants.js');
 
-//  unsecured routes
-router.route('/').get(getAllCourses);
-
 // secured routes
+router.use(verifyJWT);
+
 router
   .route('/')
+  .get(getAllCourses)
   .post(
-    verifyJWT,
     upload.single('thumbnail'),
     createCourseValidator(),
     validate,
@@ -38,15 +37,13 @@ router
 
 router
   .route('/:courseId')
-  .get(verifyJWT, mongoIdPathVariableValidator('courseId'), getCourseById)
+  .get(mongoIdPathVariableValidator('courseId'), getCourseById)
   .delete(
-    verifyJWT,
     verifyPermission([UserRolesEnum.ADMIN]),
     mongoIdPathVariableValidator('courseId'),
     deleteCourse
   )
   .patch(
-    verifyJWT,
     upload.single('thumbnail'),
     updateCourseValidator(),
     validate,

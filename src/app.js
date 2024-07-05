@@ -15,6 +15,7 @@ const startApp = () => {
   // import routes
   const userRouter = require('./routes/auth/user.routes.js');
   const courseRouter = require('./routes/course.routes.js');
+  const syllabusRouter = require('./routes/syllabus.routes.js');
 
   app.use(
     cors({
@@ -50,6 +51,7 @@ const startApp = () => {
   // routes
   app.use('/api/v1/users', userRouter);
   app.use('/api/v1/courses', courseRouter);
+  app.use('/api/v1/syllabus', syllabusRouter);
 
   // if endpoint not found
   app.use((_, __, next) => {

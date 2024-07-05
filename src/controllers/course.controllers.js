@@ -3,6 +3,7 @@ const { ApiResponse } = require('../utils/ApiResponse.js');
 const { asyncHandler } = require('../utils/asyncHandler.js');
 const Course = require('../models/course.models.js');
 const { uploadOnCloudinary } = require('../utils/cloudinary.js');
+const Syllabus = require('../models/syllabus.models.js');
 
 const getAllCourses = asyncHandler(async (req, res) => {
   const courses = await Course.find({});
@@ -95,7 +96,11 @@ const deleteCourse = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Course not found');
   }
 
-  // TODO: Remove Syllabus data related deleted course
+  // Remove Syllabus data related deleted course
+  Syllabus.deleteMany({
+    courseId: req.params.courseId,
+  });
+
   return res
     .status(200)
     .json(new ApiResponse(200, {}, 'Course deleted successfully'));
