@@ -3,8 +3,9 @@ const { body } = require('express-validator');
 const createCourseValidator = () => {
   return [
     body('title').trim().notEmpty().withMessage('Title is required'),
-    body('subTitle').trim().notEmpty().withMessage('Sub Title is required'),
-    body('about').trim().notEmpty().withMessage('about is required'),
+    body('subTitle').trim().notEmpty().withMessage('Subtitle is required'),
+    body('about').trim().notEmpty().withMessage('About is required'),
+    // You can add more validations specific to each field if needed
   ];
 };
 
@@ -15,8 +16,9 @@ const updateCourseValidator = () => {
       .optional()
       .trim()
       .notEmpty()
-      .withMessage('Sub Title is required'),
-    body('about').optional().trim().notEmpty().withMessage('about is required'),
+      .withMessage('Subtitle is required'),
+    body('about').optional().trim().notEmpty().withMessage('About is required'),
+    // You can add more validations specific to each field if needed
   ];
 };
 

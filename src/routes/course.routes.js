@@ -1,6 +1,9 @@
 const { Router } = require('express');
 const router = Router();
-const { verifyJWT } = require('../middlewares/auth.middlewares.js');
+const {
+  verifyJWT,
+  verifyPermission,
+} = require('../middlewares/auth.middlewares.js');
 const { validate } = require('../validators/validate.js');
 const {
   createCourseValidator,
@@ -17,31 +20,37 @@ const {
 const {
   mongoIdPathVariableValidator,
 } = require('../validators/mongodb.validators.js');
+const { UserRolesEnum } = require('../constants.js');
 
 //  unsecured routes
 router.route('/').get(getAllCourses);
 
 // secured routes
-router.use(verifyJWT);
-
 router
   .route('/')
   .post(
+    verifyJWT,
+    upload.single('thumbnail'),
     createCourseValidator(),
     validate,
-    upload.single('thumbnail'),
     createCourse
   );
 
 router
   .route('/:courseId')
-  .get(mongoIdPathVariableValidator('courseId'), getCourseById)
-  .delete(mongoIdPathVariableValidator('courseId'), deleteCourse)
+  .get(verifyJWT, mongoIdPathVariableValidator('courseId'), getCourseById)
+  .delete(
+    verifyJWT,
+    verifyPermission([UserRolesEnum.ADMIN]),
+    mongoIdPathVariableValidator('courseId'),
+    deleteCourse
+  )
   .patch(
+    verifyJWT,
+    upload.single('thumbnail'),
     updateCourseValidator(),
     validate,
     mongoIdPathVariableValidator('courseId'),
-    upload.single('thumbnail'),
     updateCourse
   );
 

@@ -7,6 +7,7 @@ const session = require('express-session');
 const passport = require('passport');
 const { ApiError } = require('./utils/ApiError.js');
 const { errorHandler } = require('./middlewares/error.middlewares.js');
+const morganMiddleware = require('./logger/morgan.logger.js');
 
 const app = express();
 
@@ -44,6 +45,7 @@ const startApp = () => {
 
   // Log requests with Morgan middleware (use 'combined' format for production)
   app.use(morgan('dev'));
+  app.use(morganMiddleware);
 
   // routes
   app.use('/api/v1/users', userRouter);

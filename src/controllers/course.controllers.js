@@ -2,6 +2,7 @@ const { ApiError } = require('../utils/ApiError.js');
 const { ApiResponse } = require('../utils/ApiResponse.js');
 const { asyncHandler } = require('../utils/asyncHandler.js');
 const Course = require('../models/course.models.js');
+const { uploadOnCloudinary } = require('../utils/cloudinary.js');
 
 const getAllCourses = asyncHandler(async (req, res) => {
   const courses = await Course.find({});
