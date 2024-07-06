@@ -13,6 +13,10 @@ const {
   userSelf,
   handleSocialLogin,
   updateAvatar,
+  addCourseToFavorites,
+  addCourseToEnrollments,
+  getFavoritesCourse,
+  getEnrollCourse,
 } = require('../../controllers/auth/user.controllers.js');
 const {
   userRegisterValidator,
@@ -23,6 +27,9 @@ const {
 } = require('../../validators/auth/user.validators.js');
 const { validate } = require('../../validators/validate.js');
 const { verifyJWT } = require('../../middlewares/auth.middlewares.js');
+const {
+  mongoIdPathVariableValidator,
+} = require('../../validators/mongodb.validators.js');
 const { upload } = require('../../middlewares/multer.middlewares.js');
 require('../../config/passport.config.js'); // import the passport config
 const passport = require('passport');
@@ -57,8 +64,28 @@ router.route('/update-avatar').patch(
   updateAvatar
 );
 
-//SSO Routes
+router.route('/favorites').get(verifyJWT, getFavoritesCourse);
+router.route('/enrollment').get(verifyJWT, getEnrollCourse);
 
+router
+  .route('/favorites/:courseId')
+  .post(
+    verifyJWT,
+    mongoIdPathVariableValidator('courseId'),
+    validate,
+    addCourseToFavorites
+  );
+
+router
+  .route('/enrollment/:courseId')
+  .post(
+    verifyJWT,
+    mongoIdPathVariableValidator('courseId'),
+    validate,
+    addCourseToEnrollments
+  );
+
+//SSO Routes
 router.route('/google').get(
   passport.authenticate('google', {
     scope: ['profile', 'email'],

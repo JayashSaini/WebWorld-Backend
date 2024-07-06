@@ -45,6 +45,24 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Password is required'],
   },
+  favorites: {
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Course',
+      },
+    ],
+    default: [],
+  },
+  enrollments: {
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Course',
+      },
+    ],
+    default: [],
+  },
   loginType: {
     type: String,
     enum: AvailableSocialLogins,

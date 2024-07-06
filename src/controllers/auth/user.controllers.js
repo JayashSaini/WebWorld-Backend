@@ -13,6 +13,7 @@ const { ApiError } = require('../../utils/ApiError.js');
 const { ApiResponse } = require('../../utils/ApiResponse.js');
 const { asyncHandler } = require('../../utils/asyncHandler.js');
 const { uploadOnCloudinary } = require('../../utils/cloudinary.js');
+const { default: mongoose } = require('mongoose');
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -49,8 +50,6 @@ function generateOtp() {
 
 const userRegister = asyncHandler(async (req, res) => {
   const { email, username, password, role } = req.body;
-  console.log(' compiler in the user register controller');
-
   const user = await User.create({
     email,
     password,
@@ -472,6 +471,135 @@ const handleSocialLogin = asyncHandler(async (req, res) => {
     );
 });
 
+// add courses to the favorites List
+const addCourseToFavorites = asyncHandler(async (req, res) => {
+  const { courseId } = req.params;
+
+  const user = await User.findById(req.user?.id);
+
+  if (!user) {
+    throw new ApiError(404, 'User does not exist');
+  }
+
+  if (user.favorites.includes(courseId)) {
+    throw new ApiError(400, 'Course is already in your favorites');
+  }
+
+  // check if the course exists
+  const course = await Course.findById(courseId);
+
+  if (!course) {
+    throw new ApiError(404, 'Course does not exist');
+  }
+
+  // add the course to the user's favorites list
+  user.favorites.push(courseId);
+  await user.save();
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, user, 'Course added to favorites successfully!')
+    );
+});
+
+const getFavoritesCourse = asyncHandler(async (req, res) => {
+  const favoriteCourses = await User.aggregate([
+    { $match: { _id: new mongoose.Types.ObjectId(req.user?._id) } },
+    {
+      $lookup: {
+        from: 'courses', // Name of the Course model collection
+        localField: 'favorites',
+        foreignField: '_id',
+        as: 'favoriteCourses',
+      },
+    },
+    {
+      $project: {
+        _id: 0, // Exclude _id field from user document
+        favoriteCourses: 1,
+      },
+    },
+  ]);
+  if (!favoriteCourses) {
+    return res.status(404).json({ message: 'Favorites courses not found' });
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        favoriteCourses[0],
+        'Favorites Courses fetched successfully!'
+      )
+    );
+});
+
+// add courses to the enrollment List
+const addCourseToEnrollments = asyncHandler(async (req, res) => {
+  const { courseId } = req.params;
+
+  const user = await User.findById(req.user?.id);
+
+  if (!user) {
+    throw new ApiError(404, 'User does not exist');
+  }
+
+  if (user.enrollments.includes(courseId)) {
+    throw new ApiError(400, 'Course is already in your Enrollments List');
+  }
+
+  // check if the course exists
+  const course = await Course.findById(courseId);
+
+  if (!course) {
+    throw new ApiError(404, 'Course does not exist');
+  }
+
+  // add the course to the user's favorites list
+  user.enrollments.push(courseId);
+  await user.save();
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, 'Course Enroll successfully!'));
+});
+
+const getEnrollCourse = asyncHandler(async (req, res) => {
+  const enrollCourses = await User.aggregate([
+    { $match: { _id: new mongoose.Types.ObjectId(req.user?._id) } },
+    {
+      $lookup: {
+        from: 'courses', // Name of the Course model collection
+        localField: 'enrollments',
+        foreignField: '_id',
+        as: 'enrollCourses',
+      },
+    },
+    {
+      $project: {
+        _id: 0, // Exclude _id field from user document
+        enrollCourses: 1,
+      },
+    },
+  ]);
+
+  if (!enrollCourses) {
+    return res.status(404).json({ message: 'Enroll Courses not found' });
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        enrollCourses[0],
+        'Enroll Courses fetched successfully!'
+      )
+    );
+});
+
 module.exports = {
   userRegister,
   userLogin,
@@ -486,4 +614,9 @@ module.exports = {
   generateAccessAndRefreshTokens,
   updateAvatar,
   handleSocialLogin,
+  addCourseToFavorites,
+  getFavoritesCourse,
+  getFavoritesCourse,
+  addCourseToEnrollments,
+  getEnrollCourse,
 };
