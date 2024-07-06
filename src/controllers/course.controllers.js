@@ -91,7 +91,6 @@ const updateCourse = asyncHandler(async (req, res) => {
 const deleteCourse = asyncHandler(async (req, res) => {
   const course = await Course.findByIdAndDelete(req.params.courseId);
 
-  console.log('course is : ', course);
   if (!course) {
     throw new ApiError(404, 'Course not found');
   }

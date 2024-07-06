@@ -7,7 +7,7 @@ const likeSchema = new mongoose.Schema(
       ref: 'Syllabus',
       required: true,
     },
-    likeBy: {
+    likedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
