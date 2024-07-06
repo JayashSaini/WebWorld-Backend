@@ -6,12 +6,12 @@ const {
   createSyllabus,
   updateSyllabusById,
   deleteSyllabusById,
-} = require('../controllers/syllabus.controllers');
+} = require('../controllers/syllabus.controllers.js');
 const {
   createSyllabusValidator,
   updateSyllabusValidator,
 } = require('../validators/syllabus.validators.js');
-const { validate } = require('../models/syllabus.models');
+const { validate } = require('../validators/validate.js');
 const {
   verifyJWT,
   verifyPermission,
@@ -21,12 +21,16 @@ const {
 } = require('../validators/mongodb.validators.js');
 const { UserRolesEnum } = require('../constants.js');
 
-// secure routes
+// Secure routes
 router.use(verifyJWT);
 
 router
   .route('/:courseId')
-  .get(mongoIdPathVariableValidator('courseId'), getSyllabusByCourseId)
+  .get(
+    mongoIdPathVariableValidator('courseId'),
+    validate,
+    getSyllabusByCourseId
+  )
   .post(
     verifyPermission([UserRolesEnum.ADMIN]),
     mongoIdPathVariableValidator('courseId'),
@@ -36,10 +40,16 @@ router
   );
 
 router
-  .route('/:syllabusId')
-  .get(mongoIdPathVariableValidator('syllabusId'), getSyllabusById)
+  .route('/:courseId/:syllabusId')
+  .get(
+    mongoIdPathVariableValidator('courseId'),
+    mongoIdPathVariableValidator('syllabusId'),
+    validate,
+    getSyllabusById
+  )
   .patch(
     verifyPermission([UserRolesEnum.ADMIN]),
+    mongoIdPathVariableValidator('courseId'),
     mongoIdPathVariableValidator('syllabusId'),
     updateSyllabusValidator(),
     validate,
@@ -47,7 +57,9 @@ router
   )
   .delete(
     verifyPermission([UserRolesEnum.ADMIN]),
+    mongoIdPathVariableValidator('courseId'),
     mongoIdPathVariableValidator('syllabusId'),
+    validate,
     deleteSyllabusById
   );
 

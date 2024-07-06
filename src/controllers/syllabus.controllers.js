@@ -5,7 +5,7 @@ const Syllabus = require('../models/syllabus.models.js');
 const Course = require('../models/course.models.js');
 
 const getSyllabusByCourseId = asyncHandler(async (req, res) => {
-  const syllabus = await Syllabus.findOne({ courseId: req.params.courseId });
+  const syllabus = await Syllabus.find({ courseId: req.params.courseId });
 
   if (!syllabus) {
     throw new ApiError(404, 'Syllabus not found');
@@ -29,7 +29,6 @@ const getSyllabusById = asyncHandler(async (req, res) => {
 
 const createSyllabus = asyncHandler(async (req, res) => {
   const { title, subHeading, videoUrl, videoTitle } = req.body;
-
   let course = await Course.findById(req.params?.courseId);
 
   if (!course) {
@@ -58,8 +57,11 @@ const createSyllabus = asyncHandler(async (req, res) => {
 const updateSyllabusById = asyncHandler(async (req, res) => {
   const { title, subHeading, videoUrl, videoTitle } = req.body;
 
-  const syllabus = await Syllabus.findByIdAndUpdate(
-    req.params.syllabusId,
+  const syllabus = await Syllabus.findOneAndUpdate(
+    {
+      _id: req.params.syllabusId,
+      courseId: req.params.courseId,
+    },
     {
       title,
       subHeading,
@@ -78,25 +80,18 @@ const updateSyllabusById = asyncHandler(async (req, res) => {
 });
 
 const deleteSyllabusById = asyncHandler(async (req, res) => {
-  const syllabus = await Syllabus.findByIdAndDelete(req.params?.syllabusId);
-
-  const course = await Course.findByIdAndUpdate(
-    req.params?.courseId,
-    {
-      $pull: {
-        syllabus: { _id: req.params?.syllabusId },
-      },
-    },
-    { new: true }
-  );
-
+  const course = await Course.findById(req.params.courseId);
   if (!course) {
     throw new ApiError(404, 'Course not found');
   }
 
+  const syllabus = await Syllabus.findByIdAndDelete(req.params?.syllabusId);
   if (!syllabus) {
     throw new ApiError(404, 'Syllabus not found');
   }
+
+  course.syllabus.push(syllabus._id);
+  await course.save();
 
   return res
     .status(200)
