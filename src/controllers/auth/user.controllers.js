@@ -8,7 +8,11 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const moment = require('moment');
 
-const { UserLoginType, USER_OTP_EXPIRY } = require('../../constants.js');
+const {
+  UserLoginType,
+  USER_OTP_EXPIRY,
+  UserRolesEnum,
+} = require('../../constants.js');
 const { ApiError } = require('../../utils/ApiError.js');
 const { ApiResponse } = require('../../utils/ApiResponse.js');
 const { asyncHandler } = require('../../utils/asyncHandler.js');
