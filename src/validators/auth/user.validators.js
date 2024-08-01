@@ -12,11 +12,14 @@ const userRegisterValidator = () => {
       .withMessage('Email is invalid')
       .custom(async (value) => {
         // Check if username already exists in the database
-        const exitsingUser = await User.findOne({ email: value });
+        const exitsingUser = await User.findOne({
+          email: value,
+        });
         if (exitsingUser) {
           if (exitsingUser.isEmailVerified) {
             throw new Error('Email already exists');
           }
+          await User.deleteOne({ _id: exitsingUser._id });
         }
       }),
     body('username')
@@ -29,9 +32,14 @@ const userRegisterValidator = () => {
       .withMessage('Username must be at lease 4 characters long')
       .custom(async (value) => {
         // Check if username already exists in the database
-        const exitsingUser = await User.findOne({ username: value });
+        const exitsingUser = await User.findOne({
+          username: value,
+        });
         if (exitsingUser) {
-          throw new Error('Username already exists');
+          if (exitsingUser.isEmailVerified) {
+            throw new Error('Username already exists');
+          }
+          await User.deleteOne({ _id: exitsingUser._id });
         }
       }),
     body('password')
@@ -74,6 +82,7 @@ const userForgotPasswordValidator = () => {
       .withMessage('Email is invalid'),
   ];
 };
+
 const userVerifyOtpValidator = () => {
   return [
     body('email')
