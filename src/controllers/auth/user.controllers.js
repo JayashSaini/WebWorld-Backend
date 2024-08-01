@@ -79,7 +79,7 @@ const userRegister = asyncHandler(async (req, res) => {
     subject: 'Please verify your email',
     mailgenContent: emailVerificationMailgenContent(
       user?.username || 'Buddy',
-      `${process.env.CLIENT_URI}/email-verification/${unHashedToken}`
+      `${process.env.CLIENT_URI}/auth/auth/email-verification/${unHashedToken}`
     ),
   });
 
@@ -409,7 +409,7 @@ const resendEmailVerification = asyncHandler(async (req, res) => {
     subject: 'Please verify your email',
     mailgenContent: emailVerificationMailgenContent(
       user?.username || 'Buddy',
-      `${process.env.CLIENT_URI}/email-verification/${unHashedToken}`
+      `${process.env.CLIENT_URI}/auth/email-verification/${unHashedToken}`
     ),
   });
   return res
