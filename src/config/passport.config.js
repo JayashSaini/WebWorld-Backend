@@ -1,6 +1,6 @@
 const passport = require('passport');
 const { Strategy } = require('passport-google-oauth20');
-const { User } = require('../models/auth/user.models.js');
+const User = require('../models/auth/user.models.js');
 const { UserLoginType, UserRolesEnum } = require('../constants.js');
 const { ApiError } = require('../utils/ApiError.js');
 
