@@ -79,7 +79,7 @@ const userRegister = asyncHandler(async (req, res) => {
     subject: 'Please verify your email',
     mailgenContent: emailVerificationMailgenContent(
       user?.username || 'Buddy',
-      `${process.env.CLIENT_URI}/auth/auth/email-verification/${unHashedToken}`
+      `${process.env.CLIENT_URI}/auth/email-verification/${unHashedToken}`
     ),
   });
 
@@ -454,27 +454,6 @@ const updateAvatar = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, 'Avatar updated successfully!'));
 });
 
-const handleSocialLogin = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user?._id);
-
-  if (!user) {
-    throw new ApiError(404, 'User does not exist');
-  }
-
-  const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
-    user._id
-  );
-
-  return res
-    .status(301)
-    .cookie('accessToken', accessToken, options) // set the access token in the cookie
-    .cookie('refreshToken', refreshToken, options) // set the refresh token in the cookie
-    .redirect(
-      // redirect user to the frontend with access and refresh token in case user is not using cookies
-      `${process.env.CLIENT_SSO_REDIRECT_URL}/${accessToken}/${refreshToken}`
-    );
-});
-
 // add courses to the favorites List
 const addCourseToFavorites = asyncHandler(async (req, res) => {
   const { courseId } = req.params;
@@ -617,7 +596,6 @@ module.exports = {
   userSelf,
   generateAccessAndRefreshTokens,
   updateAvatar,
-  handleSocialLogin,
   addCourseToFavorites,
   getFavoritesCourse,
   getFavoritesCourse,
