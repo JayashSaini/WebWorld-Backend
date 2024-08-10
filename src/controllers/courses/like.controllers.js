@@ -1,7 +1,7 @@
-const Like = require('../models/like.models.js');
-const { ApiError } = require('../utils/ApiError.js');
-const { ApiResponse } = require('../utils/ApiResponse.js');
-const { asyncHandler } = require('../utils/asyncHandler.js');
+const Like = require('../../models/courses/like.models.js');
+const { ApiError } = require('../../utils/ApiError.js');
+const { ApiResponse } = require('../../utils/ApiResponse.js');
+const { asyncHandler } = require('../../utils/asyncHandler.js');
 
 const toggleLike = asyncHandler(async (req, res) => {
   const { syllabusId } = req.params;

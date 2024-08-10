@@ -14,9 +14,12 @@ const app = express();
 const startApp = () => {
   // import routes
   const userRouter = require('./routes/auth/user.routes.js');
-  const courseRouter = require('./routes/course.routes.js');
-  const syllabusRouter = require('./routes/syllabus.routes.js');
-  const likeRouter = require('./routes/like.routes.js');
+  const courseRouter = require('./routes/courses/course.routes.js');
+  const syllabusRouter = require('./routes/courses/syllabus.routes.js');
+  const likeRouter = require('./routes/courses/like.routes.js');
+  const commentRouter = require('./routes/courses/comment.routes.js');
+  const blogRouter = require('./routes/blogs/blog.routes.js');
+  const blogLikeRouter = require('./routes/blogs/like.routes.js');
 
   app.use(
     cors({
@@ -52,8 +55,11 @@ const startApp = () => {
   // routes
   app.use('/api/v1/users', userRouter);
   app.use('/api/v1/courses', courseRouter);
-  app.use('/api/v1/syllabus', syllabusRouter);
-  app.use('/api/v1/likes', likeRouter);
+  app.use('/api/v1/c/syllabus', syllabusRouter);
+  app.use('/api/v1/c/likes', likeRouter);
+  app.use('/api/v1/c/comments', commentRouter);
+  app.use('/api/v1/blogs', blogRouter);
+  app.use('/api/v1/b/likes', blogLikeRouter);
 
   // if endpoint not found
   app.use((_, __, next) => {

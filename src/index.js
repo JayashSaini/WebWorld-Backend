@@ -3,9 +3,13 @@ require('dotenv').config({
 });
 const { app, startApp } = require('./app.js');
 const connectDB = require('./db/index.js');
+const { startRedis } = require('./config/redis.config.js');
 
 (async () => {
   try {
+    // connect redis server
+    await startRedis();
+
     // connect mongodb database
     await connectDB();
 

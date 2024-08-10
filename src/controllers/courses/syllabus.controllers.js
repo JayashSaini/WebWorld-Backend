@@ -1,8 +1,8 @@
-const { ApiError } = require('../utils/ApiError.js');
-const { ApiResponse } = require('../utils/ApiResponse.js');
-const { asyncHandler } = require('../utils/asyncHandler.js');
-const Syllabus = require('../models/syllabus.models.js');
-const Course = require('../models/course.models.js');
+const { ApiError } = require('../../utils/ApiError.js');
+const { ApiResponse } = require('../../utils/ApiResponse.js');
+const { asyncHandler } = require('../../utils/asyncHandler.js');
+const Syllabus = require('../../models/courses/syllabus.models.js');
+const Course = require('../../models/courses/course.models.js');
 const { default: mongoose } = require('mongoose');
 
 const getSyllabusByCourseId = asyncHandler(async (req, res) => {

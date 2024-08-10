@@ -1,9 +1,9 @@
-const { ApiError } = require('../utils/ApiError.js');
-const { ApiResponse } = require('../utils/ApiResponse.js');
-const { asyncHandler } = require('../utils/asyncHandler.js');
-const Course = require('../models/course.models.js');
-const { uploadOnCloudinary } = require('../utils/cloudinary.js');
-const Syllabus = require('../models/syllabus.models.js');
+const { ApiError } = require('../../utils/ApiError.js');
+const { ApiResponse } = require('../../utils/ApiResponse.js');
+const { asyncHandler } = require('../../utils/asyncHandler.js');
+const Course = require('../../models/courses/course.models.js');
+const { uploadOnCloudinary } = require('../../utils/cloudinary.js');
+const Syllabus = require('../../models/courses/syllabus.models.js');
 
 const getAllCourses = asyncHandler(async (req, res) => {
   const courses = await Course.find({});

@@ -22,7 +22,12 @@ const updateCourseValidator = () => {
   ];
 };
 
+const commentValidator = () => {
+  return [body('comment').trim().notEmpty().withMessage('Comment is required')];
+};
+
 module.exports = {
   createCourseValidator,
   updateCourseValidator,
+  commentValidator,
 };

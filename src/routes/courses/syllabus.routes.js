@@ -6,20 +6,20 @@ const {
   createSyllabus,
   updateSyllabusById,
   deleteSyllabusById,
-} = require('../controllers/syllabus.controllers.js');
+} = require('../../controllers/courses/syllabus.controllers.js');
 const {
   createSyllabusValidator,
   updateSyllabusValidator,
-} = require('../validators/syllabus.validators.js');
-const { validate } = require('../validators/validate.js');
+} = require('../../validators/syllabus.validators.js');
+const { validate } = require('../../validators/validate.js');
 const {
   verifyJWT,
   verifyPermission,
-} = require('../middlewares/auth.middlewares.js');
+} = require('../../middlewares/auth.middlewares.js');
 const {
   mongoIdPathVariableValidator,
-} = require('../validators/mongodb.validators.js');
-const { UserRolesEnum } = require('../constants.js');
+} = require('../../validators/mongodb.validators.js');
+const { UserRolesEnum } = require('../../constants.js');
 
 // Secure routes
 router.use(verifyJWT);

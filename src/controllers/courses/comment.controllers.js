@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
-const Comment = require('../models/comment.models.js');
-const { ApiError } = require('../utils/ApiError.js');
-const { ApiResponse } = require('../utils/ApiResponse.js');
-const { asyncHandler } = require('../utils/asyncHandler.js');
+const Comment = require('../../models/courses/comment.models.js');
+const { ApiError } = require('../../utils/ApiError.js');
+const { ApiResponse } = require('../../utils/ApiResponse.js');
+const { asyncHandler } = require('../../utils/asyncHandler.js');
 
 const getVideoComments = asyncHandler(async (req, res) => {
   //TODO: get all comments for a video
-  const { syllabus } = req.params;
+  const { videoId } = req.params;
   const { page = 1, limit = 10 } = req.query;
 
   const options = {
@@ -14,14 +14,14 @@ const getVideoComments = asyncHandler(async (req, res) => {
     limit,
   };
 
-  if (!syllabus) {
+  if (!videoId) {
     throw new ApiError(400, 'videoID is missing');
   }
   try {
     const commentAggregate = await Comment.aggregate([
       {
         $match: {
-          syllabusId: new mongoose.Types.ObjectId(syllabus),
+          syllabusId: new mongoose.Types.ObjectId(videoId),
         },
       },
       {
@@ -76,7 +76,6 @@ const addComment = asyncHandler(async (req, res) => {
   if (!comment && !videoId) {
     throw new ApiError(400, 'Comment & VideoId is required');
   }
-  console.log('comment is : ', comment);
   try {
     const addedcomment = await Comment.create({
       comment: comment,
@@ -96,19 +95,19 @@ const addComment = asyncHandler(async (req, res) => {
 
 const updateComment = asyncHandler(async (req, res) => {
   // TODO: update a comment
-  let { newcomment } = req.body;
+  let { newComment } = req.body;
   const { commentId } = req.params;
 
   if (!commentId) {
     throw new ApiResponse(400, 'comment Id is required!!!');
   }
-  if (newcomment) {
+  if (newComment) {
     try {
       const updatedComment = await Comment.findByIdAndUpdate(
         commentId,
         {
           $set: {
-            comment: newcomment,
+            comment: newComment,
           },
         },
         {
@@ -181,7 +180,13 @@ const deleteComment = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Comment id is missing');
   }
   try {
-    const deletedComment = await Comment.findByIdAndDelete(commentId);
+    const deletedComment = await Comment.findOneAndDelete({
+      _id: commentId,
+      commentBy: req.user?._id,
+    });
+    if (!deletedComment) {
+      throw new ApiError(401, 'Unauthorized to delete this comment');
+    }
     return res
       .status(200)
       .json(
