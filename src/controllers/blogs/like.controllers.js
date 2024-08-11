@@ -91,7 +91,7 @@ const getMyLikedBlogs = asyncHandler(async (req, res) => {
     },
     {
       $lookup: {
-        from: 'likes', // Assuming the likes collection name
+        from: 'bloglikes', // Assuming the likes collection name
         localField: '_id',
         foreignField: 'blogId',
         as: 'likes',

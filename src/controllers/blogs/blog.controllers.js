@@ -35,7 +35,7 @@ const getAllBlogs = asyncHandler(async (req, res) => {
   let pipeline = [
     {
       $lookup: {
-        from: 'likes',
+        from: 'bloglikes',
         let: { blogId: '$_id' },
         pipeline: [
           { $match: { $expr: { $eq: ['$blogId', '$$blogId'] } } },
@@ -137,7 +137,7 @@ const getBlogById = asyncHandler(async (req, res) => {
     },
     {
       $lookup: {
-        from: 'likes', // Adjust this to your actual likes collection name
+        from: 'bloglikes', // Adjust this to your actual likes collection name
         let: { blogId: '$_id' },
         pipeline: [
           { $match: { $expr: { $eq: ['$blogId', '$$blogId'] } } },
@@ -215,7 +215,7 @@ const getMyBlogs = asyncHandler(async (req, res) => {
     },
     {
       $lookup: {
-        from: 'likes',
+        from: 'bloglikes',
         let: { blogId: '$_id' },
         pipeline: [
           { $match: { $expr: { $eq: ['$blogId', '$$blogId'] } } },
