@@ -354,27 +354,34 @@ const updateBlog = asyncHandler(async (req, res) => {
 });
 
 const deleteBlog = asyncHandler(async (req, res) => {
-  const blog = await Blog.findById(req.params.blogId);
+  const { blogId } = req.params;
+  const userId = req.user?._id.toString();
+
+  // Find the blog by ID
+  const blog = await Blog.findById(blogId);
 
   if (!blog) {
     throw new ApiError(404, 'Blog not found');
   }
 
-  if (
-    req.user?._id.toString() !== blog.author.toString() ||
-    req.user?.role === UserRolesEnum.ADMIN
-  ) {
+  // Check if the user is authorized to delete the blog
+  const isAuthorized =
+    userId === blog.author.toString() || req.user?.role === UserRolesEnum.ADMIN;
+
+  if (!isAuthorized) {
     throw new ApiError(403, 'Unauthorized to delete this blog');
   }
 
+  // Delete image from Cloudinary if it exists
   if (blog.blogImage?.public_id) {
     await deleteImageOnCloudinary(blog.blogImage.public_id);
   }
 
+  // Delete the blog
   await blog.deleteOne();
-  return res
-    .status(200)
-    .json(new ApiResponse(200, null, 'Blog deleted successfully'));
+
+  // Send success response
+  res.status(200).json(new ApiResponse(200, null, 'Blog deleted successfully'));
 });
 
 module.exports = {
