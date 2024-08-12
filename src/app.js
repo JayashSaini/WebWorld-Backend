@@ -20,6 +20,7 @@ const startApp = () => {
   const commentRouter = require('./routes/courses/comment.routes.js');
   const blogRouter = require('./routes/blogs/blog.routes.js');
   const blogLikeRouter = require('./routes/blogs/like.routes.js');
+  const profileRouter = require('./routes/profile.routes.js');
 
   app.use(
     cors({
@@ -60,6 +61,7 @@ const startApp = () => {
   app.use('/api/v1/c/comments', commentRouter);
   app.use('/api/v1/blogs', blogRouter);
   app.use('/api/v1/b/likes', blogLikeRouter);
+  app.use('/api/v1/profile', profileRouter);
 
   // if endpoint not found
   app.use((_, __, next) => {
