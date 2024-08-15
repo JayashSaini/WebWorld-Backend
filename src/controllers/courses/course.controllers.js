@@ -4,24 +4,79 @@ const { asyncHandler } = require('../../utils/asyncHandler.js');
 const Course = require('../../models/courses/course.models.js');
 const { uploadOnCloudinary } = require('../../utils/cloudinary.js');
 const Syllabus = require('../../models/courses/syllabus.models.js');
+const mongoose = require('mongoose');
 
 const getAllCourses = asyncHandler(async (req, res) => {
-  const courses = await Course.find({});
-  return res
-    .status(200)
-    .json(new ApiResponse(200, courses, 'Courses fetched successfully'));
+  // Get page and limit from query parameters with default values
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 8;
+  const skip = (page - 1) * limit;
+
+  // Aggregate pipeline with pagination
+  const courses = await Course.aggregate([{ $skip: skip }, { $limit: limit }]);
+
+  // Count total documents to calculate the total number of pages
+  const totalCourses = await Course.countDocuments();
+  const totalPages = Math.ceil(totalCourses / limit);
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        courses,
+        page,
+        totalPages,
+        totalCourses,
+      },
+      'Courses fetched successfully'
+    )
+  );
 });
 
 const getCourseById = asyncHandler(async (req, res) => {
-  const course = await Course.findById(req.params.courseId);
+  const courseId = req.params.courseId;
 
-  if (!course) {
+  const courseWithLessons = await Course.aggregate([
+    {
+      $match: { _id: new mongoose.Types.ObjectId(courseId) },
+    },
+    {
+      $lookup: {
+        from: 'syllabuses', // the collection name where lessons are stored
+        localField: 'syllabus',
+        foreignField: '_id',
+        as: 'lessonDetails',
+      },
+    },
+    {
+      $project: {
+        title: 1,
+        syllabus: 1,
+        lessonTitles: '$lessonDetails.title',
+        thumbnail: {
+          url: 1,
+          public_id: 1,
+          _id: 1,
+        },
+        subTitle: 1,
+        about: 1,
+        syllabus: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        __v: 1,
+      },
+    },
+  ]);
+
+  if (courseWithLessons.length === 0) {
     throw new ApiError(404, 'Course not found');
   }
 
   return res
     .status(200)
-    .json(new ApiResponse(200, course, 'Course fetched successfully'));
+    .json(
+      new ApiResponse(200, courseWithLessons[0], 'Course fetched successfully')
+    );
 });
 
 const createCourse = asyncHandler(async (req, res) => {
@@ -56,26 +111,29 @@ const createCourse = asyncHandler(async (req, res) => {
 const updateCourse = asyncHandler(async (req, res) => {
   const { title, subTitle, about } = req.body;
   const thumbnailLocalPath = req.file?.path;
-  let thumbnail = {};
+  let updateFields = {};
+
+  // Conditionally add fields to updateFields
+  if (title) updateFields.title = title;
+  if (subTitle) updateFields.subTitle = subTitle;
+  if (about) updateFields.about = about;
 
   if (thumbnailLocalPath) {
-    const uploadedThumbnail = await uploadThumbnail(thumbnailLocalPath);
-    thumbnail = {
+    const uploadedThumbnail = await uploadOnCloudinary(thumbnailLocalPath);
+    updateFields.thumbnail = {
       url: uploadedThumbnail?.url,
       public_id: String(uploadedThumbnail?.public_id),
     };
   }
 
+  // Check if there are any fields to update
+  if (Object.keys(updateFields).length === 0) {
+    throw new ApiError(400, 'No fields provided to update');
+  }
+
   const course = await Course.findByIdAndUpdate(
     req.params.courseId,
-    {
-      $set: {
-        thumbnail,
-        title,
-        subTitle,
-        about,
-      },
-    },
+    { $set: updateFields },
     { new: true }
   ).select('-updatedAt');
 

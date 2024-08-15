@@ -185,7 +185,7 @@ const deleteComment = asyncHandler(async (req, res) => {
       commentBy: req.user?._id,
     });
     if (!deletedComment) {
-      throw new ApiError(401, 'Unauthorized to delete this comment');
+      throw new ApiError(403, 'Unauthorized to delete this comment');
     }
     return res
       .status(200)

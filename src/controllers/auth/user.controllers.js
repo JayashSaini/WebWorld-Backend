@@ -1,4 +1,5 @@
 const User = require('../../models/auth/user.models.js');
+const Course = require('../../models/courses/course.models.js');
 const {
   emailVerificationMailgenContent,
   sendEmail,
@@ -40,8 +41,10 @@ const generateAccessAndRefreshTokens = async (userId) => {
 };
 
 const options = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
+  maxAge: 24 * 60 * 60 * 1000 * 10, // Cookie will expire after 1 day
+  httpOnly: true, // Cookie is only accessible via HTTP(S) and not client-side JavaScript
+  secure: process.env.NODE_ENV === 'production', // Cookie will only be sent over HTTPS if in production
+  sameSite: 'strict', // SameSite attribute to prevent CSRF attacks
 };
 
 function generateOtp() {
@@ -140,8 +143,6 @@ const userLogin = asyncHandler(async (req, res) => {
     '-password -refreshToken -emailVerificationToken -emailVerificationExpiry'
   );
 
-  // TODO: Add more options to make cookie more secure and reliable
-
   return res
     .status(200)
     .cookie('accessToken', accessToken, options) // set the access token in the cookie
@@ -233,10 +234,6 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       // If token is valid but is used already
       throw new ApiError(401, 'Refresh token is expired or used');
     }
-    const options = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-    };
 
     const { accessToken, refreshToken: newRefreshToken } =
       await generateAccessAndRefreshTokens(user._id);
