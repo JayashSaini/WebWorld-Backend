@@ -33,6 +33,23 @@ const getAllCourses = asyncHandler(async (req, res) => {
   );
 });
 
+const getCoursesByQuery = asyncHandler(async (req, res) => {
+  const { query } = req.query;
+  if (!query || query.trim() === '') {
+    throw new ApiError(400, 'Please provide a search query');
+  }
+  const courses = await Course.find({
+    $or: [
+      { title: { $regex: query, $options: 'i' } }, // Case-insensitive search on title
+      { subtitle: { $regex: query, $options: 'i' } }, // Case-insensitive search on subtitle
+    ],
+  });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { courses }, 'Courses fetched successfully'));
+});
+
 const getCourseById = asyncHandler(async (req, res) => {
   const courseId = req.params.courseId;
 
@@ -169,4 +186,5 @@ module.exports = {
   createCourse,
   updateCourse,
   deleteCourse,
+  getCoursesByQuery,
 };

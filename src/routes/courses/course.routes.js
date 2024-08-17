@@ -16,6 +16,7 @@ const {
   createCourse,
   updateCourse,
   deleteCourse,
+  getCoursesByQuery,
 } = require('../../controllers/courses/course.controllers.js');
 const {
   mongoIdPathVariableValidator,
@@ -34,6 +35,8 @@ router
     validate,
     createCourse
   );
+
+router.route('/query').get(getCoursesByQuery);
 
 router
   .route('/:courseId')

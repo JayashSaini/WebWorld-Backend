@@ -415,9 +415,16 @@ const resendEmailVerification = asyncHandler(async (req, res) => {
 });
 
 const userSelf = asyncHandler(async (req, res) => {
-  return res
-    .status(200)
-    .json(new ApiResponse(200, req.user, 'User fetched successfully'));
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        user: req.user,
+        accessToken: req.cookies.accessToken,
+      },
+      'User fetched successfully'
+    )
+  );
 });
 
 const updateAvatar = asyncHandler(async (req, res) => {
