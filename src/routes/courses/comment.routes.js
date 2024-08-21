@@ -18,7 +18,7 @@ router.use(verifyJWT);
 router
   .route('/:videoId')
   .post(
-    commentValidator,
+    commentValidator(),
     mongoIdPathVariableValidator('videoId'),
     validate,
     addComment
@@ -28,7 +28,7 @@ router
   .route('/:commentId')
   .delete(mongoIdPathVariableValidator('commentId'), validate, deleteComment)
   .patch(
-    commentValidator,
+    commentValidator(),
     mongoIdPathVariableValidator('commentId'),
     validate,
     updateComment

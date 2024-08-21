@@ -459,7 +459,7 @@ const updateAvatar = asyncHandler(async (req, res) => {
 });
 
 // add courses to the favorites List
-const addCourseToFavorites = asyncHandler(async (req, res) => {
+const toggleCourseToFavorites = asyncHandler(async (req, res) => {
   const { courseId } = req.params;
 
   const user = await User.findById(req.user?.id);
@@ -469,17 +469,27 @@ const addCourseToFavorites = asyncHandler(async (req, res) => {
   }
 
   if (user.favorites.includes(courseId)) {
-    throw new ApiError(400, 'Course is already in your favorites');
+    // Remove the course from favorites using pull
+    user.favorites.pull(courseId);
+    await user.save();
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          user,
+          'Course removed from favorites successfully!'
+        )
+      );
   }
 
-  // check if the course exists
+  // Check if the course exists
   const course = await Course.findById(courseId);
-
   if (!course) {
     throw new ApiError(404, 'Course does not exist');
   }
 
-  // add the course to the user's favorites list
+  // Add the course to the user's favorites list
   user.favorites.push(courseId);
   await user.save();
 
@@ -600,7 +610,7 @@ module.exports = {
   userSelf,
   generateAccessAndRefreshTokens,
   updateAvatar,
-  addCourseToFavorites,
+  toggleCourseToFavorites,
   getFavoritesCourse,
   getFavoritesCourse,
   addCourseToEnrollments,

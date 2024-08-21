@@ -7,167 +7,109 @@ const { asyncHandler } = require('../../utils/asyncHandler.js');
 const getVideoComments = asyncHandler(async (req, res) => {
   //TODO: get all comments for a video
   const { videoId } = req.params;
-  const { page = 1, limit = 10 } = req.query;
-
-  const options = {
-    page,
-    limit,
-  };
 
   if (!videoId) {
     throw new ApiError(400, 'videoID is missing');
   }
-  try {
-    const commentAggregate = await Comment.aggregate([
-      {
-        $match: {
-          syllabusId: new mongoose.Types.ObjectId(videoId),
-        },
+
+  const commentAggregate = await Comment.aggregate([
+    {
+      $match: {
+        syllabusId: new mongoose.Types.ObjectId(videoId),
       },
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'owner',
-          foreignField: '_id',
-          as: 'owner',
-          pipeline: [
-            {
-              $project: {
-                username: 1,
-                avatar: 1,
-              },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'commentBy',
+        foreignField: '_id',
+        as: 'owner',
+        pipeline: [
+          {
+            $project: {
+              username: 1,
+              avatar: 1,
             },
-          ],
-        },
-      },
-      {
-        $addFields: {
-          owner: {
-            $arrayElemAt: ['$owner', 0],
           },
+        ],
+      },
+    },
+    {
+      $addFields: {
+        owner: {
+          $arrayElemAt: ['$owner', 0],
         },
       },
-    ]);
+    },
+  ]);
 
-    // const comments = await Comment.aggregatePaginate(commentAggregate, options);
+  // const comments = await Comment.aggregatePaginate(commentAggregate, options);
 
-    if (!commentAggregate) {
-      throw new ApiError(400, 'videoID is missing');
-    }
-    return res
-      .status(200)
-      .json(
-        new ApiResponse(200, commentAggregate, 'Comment fetched successfully')
-      );
-  } catch (error) {
-    throw new ApiError(
-      500,
-      error.message || 'Something went wrong while accessing the comments'
-    );
+  if (!commentAggregate) {
+    throw new ApiError(400, 'videoID is missing');
   }
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, commentAggregate, 'Comment fetched successfully')
+    );
 });
 
 const addComment = asyncHandler(async (req, res) => {
-  // TODO: add a comment to a video
+  // Log to confirm the function is running
+  console.log('Add Comment API is running');
 
   const { comment } = req.body;
   const { videoId } = req.params;
 
-  if (!comment && !videoId) {
-    throw new ApiError(400, 'Comment & VideoId is required');
+  // Check if both comment and videoId are provided
+  if (!comment || !videoId) {
+    throw new ApiError(400, 'Both comment and videoId are required');
   }
-  try {
-    const addedcomment = await Comment.create({
-      comment: comment,
-      owner: req.user._id,
-      video: videoId,
-    });
-    return res
-      .status(200)
-      .json(new ApiResponse(200, addedcomment, 'Comment added successfully'));
-  } catch (error) {
-    throw new ApiError(
-      500,
-      error.message || 'Error while uploading the comment'
-    );
-  }
+
+  // Create a new comment in the database
+  const addedComment = await Comment.create({
+    comment: comment,
+    commentBy: req.user._id,
+    syllabusId: videoId,
+  });
+
+  // Return a success response with the newly added comment
+  return res
+    .status(200)
+    .json(new ApiResponse(200, addedComment, 'Comment added successfully'));
 });
 
 const updateComment = asyncHandler(async (req, res) => {
-  // TODO: update a comment
-  let { newComment } = req.body;
+  let { comment } = req.body;
   const { commentId } = req.params;
 
   if (!commentId) {
     throw new ApiResponse(400, 'comment Id is required!!!');
   }
-  if (newComment) {
-    try {
-      const updatedComment = await Comment.findByIdAndUpdate(
-        commentId,
-        {
-          $set: {
-            comment: newComment,
-          },
-        },
-        {
-          new: true,
-        }
-      );
 
-      return res
-        .status(200)
-        .json(
-          new ApiResponse(200, updatedComment, 'Comment update successfully')
-        );
-    } catch (error) {
-      throw new ApiError(
-        500,
-        error.message || 'Something went wrong while updating the comment'
-      );
-    }
-  }
   try {
-    let updatedComment2 = await Comment.aggregate([
+    const updatedComment = await Comment.findByIdAndUpdate(
+      commentId,
       {
-        $match: {
-          _id: new mongoose.Types.ObjectId(commentId),
-        },
-      },
-
-      {
-        $lookup: {
-          from: 'likes',
-          localField: '_id',
-          foreignField: 'comment',
-          as: 'likedBy',
+        $set: {
+          comment: comment,
         },
       },
       {
-        $addFields: {
-          likedBy: {
-            $size: '$likedBy',
-          },
-        },
-      },
-    ]);
-    if (!updatedComment2) {
-      throw new ApiError(501, 'Comment is not exist');
-    }
+        new: true,
+      }
+    );
 
     return res
       .status(200)
       .json(
-        new ApiResponse(
-          200,
-          { updatedComment: updatedComment2 },
-          'Comment update successfully'
-        )
+        new ApiResponse(200, updatedComment, 'Comment update successfully')
       );
   } catch (error) {
     throw new ApiError(
       500,
-      error.message || 'Error while updating the comment'
+      error.message || 'Something went wrong while updating the comment'
     );
   }
 });

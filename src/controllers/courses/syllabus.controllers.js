@@ -30,7 +30,7 @@ const getSyllabusById = asyncHandler(async (req, res) => {
     },
     {
       $lookup: {
-        from: 'likes', // Adjust this to your actual likes collection name
+        from: 'courselikes', // Adjust this to your actual likes collection name
         let: { syllabusId: '$_id' },
         pipeline: [
           { $match: { $expr: { $eq: ['$syllabusId', '$$syllabusId'] } } },

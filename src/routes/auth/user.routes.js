@@ -12,11 +12,11 @@ const {
   resendEmailVerification,
   userSelf,
   updateAvatar,
-  addCourseToFavorites,
-  addCourseToEnrollments,
   getFavoritesCourse,
   getEnrollCourse,
   generateAccessAndRefreshTokens,
+  addCourseToEnrollments,
+  toggleCourseToFavorites,
 } = require('../../controllers/auth/user.controllers.js');
 const {
   userRegisterValidator,
@@ -73,7 +73,7 @@ router
     verifyJWT,
     mongoIdPathVariableValidator('courseId'),
     validate,
-    addCourseToFavorites
+    toggleCourseToFavorites
   );
 
 router

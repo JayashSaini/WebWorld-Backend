@@ -59,7 +59,7 @@ const getCourseById = asyncHandler(async (req, res) => {
     },
     {
       $lookup: {
-        from: 'syllabuses', // the collection name where lessons are stored
+        from: 'syllabuses', // The collection name where lessons are stored
         localField: 'syllabus',
         foreignField: '_id',
         as: 'lessonDetails',
@@ -69,7 +69,16 @@ const getCourseById = asyncHandler(async (req, res) => {
       $project: {
         title: 1,
         syllabus: 1,
-        lessonTitles: '$lessonDetails.title',
+        lessonTitles: {
+          $map: {
+            input: '$lessonDetails',
+            as: 'lesson',
+            in: {
+              _id: '$$lesson._id',
+              title: '$$lesson.title',
+            },
+          },
+        },
         thumbnail: {
           url: 1,
           public_id: 1,
@@ -77,7 +86,6 @@ const getCourseById = asyncHandler(async (req, res) => {
         },
         subTitle: 1,
         about: 1,
-        syllabus: 1,
         createdAt: 1,
         updatedAt: 1,
         __v: 1,
