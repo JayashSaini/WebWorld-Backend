@@ -114,7 +114,7 @@ router.route('/google/callback').get((req, res, next) => {
         'info is : ',
         info,
         'error is : ',
-        error
+        err
       );
       // If no redirection specified, handle other types of errors or redirect to a default error page
       return res.redirect('?error=' + encodeURIComponent('unhandled error'));
@@ -126,7 +126,7 @@ router.route('/google/callback').get((req, res, next) => {
       'info is : ',
       info,
       'error is : ',
-      error
+      err
     );
     // If authentication succeeds, proceed to the next middleware
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
@@ -144,7 +144,7 @@ router.route('/google/callback').get((req, res, next) => {
       'info is : ',
       info,
       'error is : ',
-      error
+      err
     );
     return res
       .status(301)
