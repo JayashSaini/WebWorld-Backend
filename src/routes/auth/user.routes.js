@@ -108,9 +108,26 @@ router.route('/google/callback').get((req, res, next) => {
           info.redirectTo + '?error=' + encodeURIComponent(info.message)
         );
       }
+      console.log(
+        'error block Passport dets : ',
+        user,
+        'info is : ',
+        info,
+        'error is : ',
+        error
+      );
       // If no redirection specified, handle other types of errors or redirect to a default error page
       return res.redirect('?error=' + encodeURIComponent('unhandled error'));
     }
+
+    console.log(
+      'Passport dets : ',
+      user,
+      'info is : ',
+      info,
+      'error is : ',
+      error
+    );
     // If authentication succeeds, proceed to the next middleware
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
       user._id
@@ -121,7 +138,14 @@ router.route('/google/callback').get((req, res, next) => {
       secure: process.env.NODE_ENV === 'production', // Cookie will only be sent over HTTPS if in production
       sameSite: 'strict', // SameSite attribute to prevent CSRF attacks
     };
-
+    console.log(
+      'after Passport deta : ',
+      user,
+      'info is : ',
+      info,
+      'error is : ',
+      error
+    );
     return res
       .status(301)
       .cookie('accessToken', accessToken, options) // set the access token in the cookie
